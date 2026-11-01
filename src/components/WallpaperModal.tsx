@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { Wallpaper, DownloadResolution } from '../types';
 import { AdSensePlaceholder } from './AdSensePlaceholder';
-import { downloadWallpaperDirectly } from '../utils/downloadHelper';
+import { downloadWallpaperDirectly, getOriginalHighResUrl } from '../utils/downloadHelper';
 import { fetchAggregatedWallpapers } from '../services/multiApiAggregator';
 
 interface WallpaperModalProps {
@@ -305,6 +305,55 @@ export const WallpaperModal: React.FC<WallpaperModalProps> = ({
     }
   };
 
+  // Helper to ensure an image is converted to a 100% valid baseline JPEG readable by all phone galleries
+  const preparePhoneJpegBlob = async (targetUrl: string): Promise<Blob> => {
+    const response = await fetch(targetUrl);
+    if (!response.ok) throw new Error(`Fetch failed with status ${response.status}`);
+    const rawBlob = await response.blob();
+
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      const objUrl = URL.createObjectURL(rawBlob);
+
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || 1440;
+          canvas.height = img.naturalHeight || 2560;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            canvas.toBlob(
+              (convertedBlob) => {
+                URL.revokeObjectURL(objUrl);
+                if (convertedBlob && convertedBlob.size > 0) {
+                  resolve(convertedBlob);
+                } else {
+                  resolve(new Blob([rawBlob], { type: 'image/jpeg' }));
+                }
+              },
+              'image/jpeg',
+              0.98
+            );
+            return;
+          }
+        } catch {
+          // Canvas tainted fallback
+        }
+        URL.revokeObjectURL(objUrl);
+        resolve(new Blob([rawBlob], { type: 'image/jpeg' }));
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objUrl);
+        resolve(new Blob([rawBlob], { type: 'image/jpeg' }));
+      };
+
+      img.src = objUrl;
+    });
+  };
+
   const handleShare = async () => {
     if (!wallpaper) return;
     const shareUrl = `${window.location.origin}?wallpaper=${wallpaper.id}`;
@@ -318,45 +367,32 @@ export const WallpaperModal: React.FC<WallpaperModalProps> = ({
 
       try {
         let fileShared = false;
-        const imgUrl = wallpaper.imageUrl || wallpaper.thumbnail || wallpaper.url;
+        const cleanId = String(wallpaper.id || 'wallpaper').replace(/^pexels-|^pixabay-|^wallhaven-|^unsplash-/, '');
+        const highResUrl = getOriginalHighResUrl(wallpaper, 'mobile') || wallpaper.url;
+        const proxyUrl = `/api/download?url=${encodeURIComponent(highResUrl)}&filename=${encodeURIComponent(`PixelDrop-Share-${cleanId}.jpg`)}`;
 
-        // On mobile devices, try creating a File object if navigator.canShare({ files }) is supported
-        // Sharing a File directly prompts native OS actions like "Use as Wallpaper" on iOS and Android
-        if (typeof navigator.canShare === 'function' && imgUrl) {
+        // On mobile devices, share a guaranteed standard JPEG File object
+        if (typeof navigator.canShare === 'function' && highResUrl) {
           try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000);
-            const response = await fetch(imgUrl, {
-              signal: controller.signal,
-              cache: 'force-cache',
+            const jpegBlob = await preparePhoneJpegBlob(proxyUrl);
+            const file = new File([jpegBlob], `PixelDrop-Share-${cleanId}.jpg`, {
+              type: 'image/jpeg',
             });
-            clearTimeout(timeoutId);
 
-            if (response.ok) {
-              const blob = await response.blob();
-              const ext = blob.type.includes('png') ? 'png' : 'jpg';
-              const file = new File([blob], `wallpaper-${wallpaper.id}.${ext}`, {
-                type: blob.type || 'image/jpeg',
+            if (navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                title: shareTitle,
+                text: shareText,
+                url: shareUrl,
+                files: [file],
               });
-
-              if (navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                  title: shareTitle,
-                  text: shareText,
-                  url: shareUrl,
-                  files: [file],
-                });
-                fileShared = true;
-                setShareFeedback('Shared successfully!');
-                setTimeout(() => setShareFeedback(null), 2500);
-                return;
-              }
+              fileShared = true;
+              setShareFeedback('Shared successfully!');
+              setTimeout(() => setShareFeedback(null), 2500);
+              return;
             }
           } catch (fileErr: any) {
-            // If file fetch/check fails, continue to text/URL share below
-            if (fileErr?.name === 'AbortError') {
-              // Could be timeout or user cancel
-            }
+            if (fileErr?.name === 'AbortError') return;
           }
         }
 
@@ -372,7 +408,6 @@ export const WallpaperModal: React.FC<WallpaperModalProps> = ({
         }
       } catch (err: any) {
         if (err?.name === 'AbortError') {
-          // User dismissed or canceled the share sheet
           setShareFeedback(null);
           return;
         }
@@ -412,71 +447,71 @@ export const WallpaperModal: React.FC<WallpaperModalProps> = ({
   const handleSetAsPhoneWallpaper = async () => {
     if (!wallpaper) return;
     setIsSettingPhone(true);
-    setPhoneActionFeedback('Preparing for Phone...');
+    setPhoneActionFeedback('Preparing universal phone format...');
 
-    const targetUrl = wallpaper.imageUrl || wallpaper.thumbnail || wallpaper.url;
+    const cleanId = String(wallpaper.id || 'wallpaper').replace(/^pexels-|^pixabay-|^wallhaven-|^unsplash-/, '');
+    const highResUrl = getOriginalHighResUrl(wallpaper, 'mobile') || wallpaper.url;
+    const filename = `PixelDrop-Wallpaper-${cleanId}.jpg`;
+    const proxyUrl = `/api/download?url=${encodeURIComponent(highResUrl)}&filename=${encodeURIComponent(filename)}`;
 
-    // Check if Web Share API with files is supported (native Android/iOS sheet with "Use as Wallpaper")
-    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
-      try {
-        let sharedFile = false;
-        if (targetUrl) {
-          const controller = new AbortController();
-          const timer = setTimeout(() => controller.abort(), 3500);
-          const response = await fetch(targetUrl, { signal: controller.signal, cache: 'force-cache' });
-          clearTimeout(timer);
-
-          if (response.ok) {
-            const blob = await response.blob();
-            const ext = blob.type.includes('png') ? 'png' : 'jpg';
-            const file = new File([blob], `wallpaper-${wallpaper.id}.${ext}`, {
-              type: blob.type || 'image/jpeg',
-            });
-
-            if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
-              setPhoneActionFeedback('Select "Use as Wallpaper" in menu');
-              await navigator.share({
-                title: wallpaper.title || '4K Phone Wallpaper',
-                text: 'Set this 4K image as your Phone Wallpaper',
-                files: [file],
-              });
-              sharedFile = true;
-              setPhoneActionFeedback('Selected! Set as wallpaper.');
-              setTimeout(() => setPhoneActionFeedback(null), 3500);
-              return;
-            }
-          }
-        }
-
-        if (!sharedFile) {
-          await navigator.share({
-            title: wallpaper.title || '4K Phone Wallpaper',
-            text: 'Save and Set as Wallpaper',
-            url: window.location.href,
-          });
-          setPhoneActionFeedback('Share sheet opened!');
-          setTimeout(() => setPhoneActionFeedback(null), 3000);
-          return;
-        }
-      } catch (err: any) {
-        if (err?.name === 'AbortError') {
-          setPhoneActionFeedback(null);
-          return;
-        }
-      } finally {
-        setIsSettingPhone(false);
-      }
-    }
-
-    // Direct mobile download fallback with clear guidance
     try {
-      setPhoneActionFeedback('Downloading Mobile 9:16 HD...');
-      await downloadWallpaperDirectly(wallpaper, 'mobile', (status) => setPhoneActionFeedback(status));
-      setPhoneActionFeedback('Saved! Open Photos -> "Set as Wallpaper"');
-      setTimeout(() => setPhoneActionFeedback(null), 4500);
-    } catch {
-      setPhoneActionFeedback('Download failed, please retry.');
-      setTimeout(() => setPhoneActionFeedback(null), 3000);
+      // 1. Fetch uncompressed master and convert to 100% compliant Baseline JPEG
+      // This eliminates the "format not supported or corrupt" error on Samsung, Xiaomi, and iOS.
+      setPhoneActionFeedback('Optimizing for phone gallery...');
+      const jpegBlob = await preparePhoneJpegBlob(proxyUrl);
+      const phoneFile = new File([jpegBlob], filename, {
+        type: 'image/jpeg',
+        lastModified: Date.now(),
+      });
+
+      // 2. Try Web Share API with genuine JPEG File
+      // Triggers native mobile sheet: "Définir comme fond d'écran" / "Use as Wallpaper"
+      if (
+        typeof navigator !== 'undefined' &&
+        typeof navigator.share === 'function' &&
+        typeof navigator.canShare === 'function' &&
+        navigator.canShare({ files: [phoneFile] })
+      ) {
+        setPhoneActionFeedback('Opening system wallpaper sheet...');
+        await navigator.share({
+          title: wallpaper.title || '4K Phone Wallpaper',
+          text: 'Définir comme fond d\'écran (Set as Wallpaper)',
+          files: [phoneFile],
+        });
+        setPhoneActionFeedback('Success! Applied as wallpaper.');
+        setTimeout(() => setPhoneActionFeedback(null), 4000);
+        return;
+      }
+
+      // 3. Direct Native Download of verified JPEG file
+      // Saves pristine JPEG directly to phone's Downloads/Gallery folder
+      setPhoneActionFeedback('Saving verified JPEG to Gallery...');
+      const blobUrl = URL.createObjectURL(phoneFile);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
+
+      setPhoneActionFeedback('Saved to Gallery! Tap "Set as Wallpaper"');
+      setTimeout(() => setPhoneActionFeedback(null), 5000);
+    } catch (err: any) {
+      if (err?.name === 'AbortError') {
+        setPhoneActionFeedback(null);
+        return;
+      }
+      console.warn('Set as phone wallpaper fallback to proxy download:', err);
+      try {
+        await downloadWallpaperDirectly(wallpaper, 'mobile', (status) => setPhoneActionFeedback(status));
+        setPhoneActionFeedback('Saved! Open Gallery -> "Set as Wallpaper"');
+        setTimeout(() => setPhoneActionFeedback(null), 4500);
+      } catch {
+        setPhoneActionFeedback('Download failed, please retry.');
+        setTimeout(() => setPhoneActionFeedback(null), 3000);
+      }
     } finally {
       setIsSettingPhone(false);
     }

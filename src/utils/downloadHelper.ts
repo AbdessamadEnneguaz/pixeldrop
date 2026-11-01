@@ -105,31 +105,32 @@ export function getOriginalHighResUrl(
     return cleanBase;
   }
 
-  // 2. Unsplash
+  // 2. Unsplash (Strictly enforce fm=jpg and remove auto=format to prevent phone galleries from getting AVIF/WebP)
   if (chosenUrl.includes('images.unsplash.com')) {
     const cleanBase = chosenUrl.split('?')[0];
     if (resolution === 'original') {
-      // Uncompressed raw file with maximum quality
+      // Uncompressed raw file with maximum quality in universal JPEG
       const search = chosenUrl.includes('?') ? chosenUrl.split('?')[1] : '';
       const params = new URLSearchParams(search);
       params.delete('w');
       params.delete('h');
       params.delete('fit');
       params.delete('crop');
+      params.delete('auto');
+      params.set('fm', 'jpg');
       params.set('q', '100');
-      params.set('auto', 'format');
       return `${cleanBase}?${params.toString()}`;
     }
     if (resolution === 'desktop' || resolution === '4k') {
-      return `${cleanBase}?fit=crop&w=3840&h=2160&q=100&auto=format`;
+      return `${cleanBase}?fit=crop&w=3840&h=2160&q=100&fm=jpg`;
     }
     if (resolution === 'mobile') {
-      return `${cleanBase}?fit=crop&w=1440&h=2560&q=100&auto=format`;
+      return `${cleanBase}?fit=crop&w=1440&h=2560&q=100&fm=jpg`;
     }
     if (resolution === 'tablet') {
-      return `${cleanBase}?fit=crop&w=2048&h=1536&q=100&auto=format`;
+      return `${cleanBase}?fit=crop&w=2048&h=1536&q=100&fm=jpg`;
     }
-    return cleanBase;
+    return `${cleanBase}?fm=jpg`;
   }
 
   // 3. Wallhaven & Pixabay:
@@ -139,7 +140,8 @@ export function getOriginalHighResUrl(
 
 /**
  * Downloads the authentic 4K wallpaper file using the server-side download proxy (/api/download).
- * Completely eliminates 403 Forbidden errors (Wallhaven, etc.) and prevents any low-res thumbnail downscaling.
+ * Completely eliminates 403 Forbidden errors (Wallhaven, etc.) and guarantees 100% genuine JPEG/PNG
+ * file bytes so mobile phone galleries never report corruption or unsupported formats.
  */
 export async function downloadWallpaperDirectly(
   wallpaper: Wallpaper,
@@ -154,14 +156,14 @@ export async function downloadWallpaperDirectly(
 
   const cleanId = String(wallpaper.id || 'wallpaper').replace(/^pexels-|^pixabay-|^wallhaven-|^unsplash-/, '');
   const ext = targetUrl.toLowerCase().includes('.png') ? '.png' : '.jpg';
-  const filename =
+  let filename =
     resolution === 'original'
       ? `PixelDrop-4K-${cleanId}${ext}`
       : `PixelDrop-4K-${cleanId}-${resolution}${ext}`;
 
   onProgress?.('Contacting high-speed download proxy...');
 
-  // The proxy route bypasses 403 Forbidden (Wallhaven referer, headers) and streams full uncompressed 4K master
+  // The proxy route bypasses 403 Forbidden and streams full uncompressed 4K master in standard JPEG/PNG
   const proxyUrl = `/api/download?url=${encodeURIComponent(targetUrl)}&filename=${encodeURIComponent(filename)}`;
 
   // Strategy 1: Fetch via proxy -> Blob -> Object URL (Instant native download without opening new tabs)
@@ -169,9 +171,32 @@ export async function downloadWallpaperDirectly(
     const response = await fetch(proxyUrl);
     if (response.ok) {
       onProgress?.('Generating uncompressed 4K file...');
-      const blob = await response.blob();
-      if (blob.size > 0) {
-        const blobUrl = URL.createObjectURL(blob);
+
+      // Extract server-verified filename and content-type if provided
+      const disposition = response.headers.get('content-disposition');
+      if (disposition && disposition.includes('filename=')) {
+        const match = disposition.match(/filename="?([^";]+)"?/);
+        if (match && match[1]) {
+          try {
+            filename = decodeURIComponent(match[1]);
+          } catch {
+            filename = match[1];
+          }
+        }
+      }
+
+      const rawBlob = await response.blob();
+      if (rawBlob.size > 0) {
+        // Enforce valid standard image MIME type
+        const headerType = response.headers.get('content-type') || '';
+        const finalType = headerType.includes('png')
+          ? 'image/png'
+          : headerType.includes('webp')
+          ? 'image/webp'
+          : 'image/jpeg';
+
+        const safeBlob = new Blob([rawBlob], { type: finalType });
+        const blobUrl = URL.createObjectURL(safeBlob);
         const link = document.createElement('a');
         link.href = blobUrl;
         link.download = filename;

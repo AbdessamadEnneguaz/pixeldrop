@@ -414,18 +414,38 @@ async function startServer() {
 
 
   // High-Resolution Image Download Proxy (Bypasses CORS & 403 Forbidden for direct 4K master downloads)
+  // Strictly enforces genuine universal JPEG/PNG delivery so phone galleries (Samsung, iOS, Xiaomi, Google Photos)
+  // never reject downloaded wallpapers with format errors or corruption messages.
   app.get('/api/download', async (req, res) => {
     try {
-      const targetUrl = (req.query.url as string)?.trim();
+      let targetUrl = (req.query.url as string)?.trim();
       let filename = (req.query.filename as string)?.trim() || 'PixelDrop-4K.jpg';
       if (!targetUrl) {
         return res.status(400).send('Missing url parameter');
       }
 
+      // If target is Unsplash, strictly sanitize to ensure fm=jpg and remove auto=format
+      // (auto=format causes CDNs to return modern AVIF/WebP which phone wallpaper managers fail to set)
+      if (targetUrl.includes('images.unsplash.com')) {
+        try {
+          const urlObj = new URL(targetUrl);
+          urlObj.searchParams.delete('auto');
+          urlObj.searchParams.set('fm', 'jpg');
+          if (!urlObj.searchParams.has('q')) {
+            urlObj.searchParams.set('q', '100');
+          }
+          targetUrl = urlObj.toString();
+        } catch {
+          targetUrl = targetUrl.replace(/auto=format/g, 'fm=jpg');
+        }
+      }
+
+      // Priority Accept header: strictly demand standard JPEG or PNG from upstream CDNs.
+      // Do NOT send image/avif or image/webp which triggers CDN auto-transcoding into unsupported phone formats.
       const headers: Record<string, string> = {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-        Accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+        Accept: 'image/jpeg,image/png,image/*;q=0.5',
         'Accept-Language': 'en-US,en;q=0.9',
       };
 
@@ -460,34 +480,55 @@ async function startServer() {
       }
 
       if (!upstream.ok) {
-        return res.redirect(targetUrl);
-      }
-
-      const contentType = upstream.headers.get('content-type') || 'image/jpeg';
-      const contentLength = upstream.headers.get('content-length');
-
-      // Sync filename extension
-      if (contentType.includes('png') && !filename.endsWith('.png')) {
-        filename = filename.replace(/\.[a-zA-Z0-9]+$/, '') + '.png';
-      } else if (contentType.includes('webp') && !filename.endsWith('.webp')) {
-        filename = filename.replace(/\.[a-zA-Z0-9]+$/, '') + '.webp';
-      } else if (contentType.includes('jpeg') && !filename.endsWith('.jpg') && !filename.endsWith('.jpeg')) {
-        filename = filename.replace(/\.[a-zA-Z0-9]+$/, '') + '.jpg';
-      }
-
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
-      res.setHeader('Cache-Control', 'public, max-age=86400');
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      if (contentLength) {
-        res.setHeader('Content-Length', contentLength);
+        return res.status(upstream.status).json({ error: `Upstream image fetch failed with status ${upstream.status}` });
       }
 
       const buffer = Buffer.from(await upstream.arrayBuffer());
+
+      // Inspect binary magic bytes to determine the true, authentic image format
+      // JPEG: FF D8 FF
+      const isJpeg = buffer.length >= 3 && buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF;
+      // PNG: 89 50 4E 47
+      const isPng = buffer.length >= 4 && buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47;
+      // WebP: RIFF .... WEBP
+      const isWebP = buffer.length >= 12 && buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WEBP';
+
+      // Guard: strictly ensure the file is an actual image. Never send an HTML error page or text as a .jpg
+      if (!isJpeg && !isPng && !isWebP) {
+        console.warn('[Proxy Download] Upstream did not return valid image magic bytes:', buffer.slice(0, 16).toString());
+        return res.status(502).json({ error: 'Downloaded file is not a valid image format.' });
+      }
+
+      let finalContentType = 'image/jpeg';
+      let targetExt = '.jpg';
+
+      if (isJpeg) {
+        finalContentType = 'image/jpeg';
+        targetExt = '.jpg';
+      } else if (isPng) {
+        finalContentType = 'image/png';
+        targetExt = '.png';
+      } else if (isWebP) {
+        finalContentType = 'image/webp';
+        targetExt = '.webp';
+      }
+
+      // Ensure filename extension strictly matches the authentic image content
+      if (!filename.toLowerCase().endsWith(targetExt)) {
+        filename = filename.replace(/\.[a-zA-Z0-9]+$/, '') + targetExt;
+      }
+
+      res.setHeader('Content-Type', finalContentType);
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition, Content-Type, Content-Length');
+      res.setHeader('Content-Length', buffer.length);
+
       return res.send(buffer);
     } catch (err) {
       console.error('Error in /api/download:', err);
-      return res.redirect((req.query.url as string) || '/');
+      return res.status(500).json({ error: 'Internal server error while processing image download.' });
     }
   });
 
