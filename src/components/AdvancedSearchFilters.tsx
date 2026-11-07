@@ -156,13 +156,13 @@ export const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
         )}
       </div>
 
-      {/* Expanded Pexels Style Clean Filter Options */}
+      {/* Expanded Linear / Pexels Style Clean Filter Options */}
       {isOpen && (
-        <div className="mt-3 p-4 rounded-2xl bg-zinc-50 dark:bg-[#151720] border border-zinc-200 dark:border-zinc-800 space-y-4 animate-in fade-in duration-150">
+        <div className="mt-3 p-4 rounded-2xl bg-[#121215] border border-[#1f1f1f] space-y-4 animate-in fade-in duration-150 shadow-2xl">
           {/* Resolution Options */}
           <div className="space-y-2">
-            <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-              <Maximize2 className="w-3.5 h-3.5 text-emerald-500" />
+            <div className="text-xs font-semibold text-white flex items-center gap-1.5 font-['Plus_Jakarta_Sans',sans-serif]">
+              <Maximize2 className="w-3.5 h-3.5 text-[#8b95f6]" />
               <span>Resolution Quality</span>
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -172,10 +172,10 @@ export const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
                   <button
                     key={res.id}
                     onClick={() => onChangeResolution(res.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer border ${
                       isSelected
-                        ? 'bg-emerald-500 text-white border-emerald-600 shadow-xs font-semibold'
-                        : 'bg-white dark:bg-[#1f222e] text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700/60 hover:border-zinc-400 dark:hover:border-zinc-500'
+                        ? 'bg-[#1f1f26] text-white border-[#5e6ad2] shadow-sm shadow-[#5e6ad2]/20 font-semibold'
+                        : 'bg-[#18181b] text-zinc-300 border-[#27272a] hover:border-[#383840] hover:text-white'
                     }`}
                   >
                     {res.label}
@@ -188,14 +188,14 @@ export const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
           {/* Color Palette Options */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-                <Palette className="w-3.5 h-3.5 text-emerald-500" />
+              <div className="text-xs font-semibold text-white flex items-center gap-1.5 font-['Plus_Jakarta_Sans',sans-serif]">
+                <Palette className="w-3.5 h-3.5 text-[#8b95f6]" />
                 <span>Color Palette</span>
               </div>
               <button
                 type="button"
                 onClick={() => setShowCustomHexInput(!showCustomHexInput)}
-                className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+                className="text-[11px] text-[#8b95f6] hover:underline cursor-pointer"
               >
                 {showCustomHexInput ? 'Hide Custom Hex' : '+ Custom Hex'}
               </button>
@@ -205,14 +205,14 @@ export const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
               <form onSubmit={handleApplyCustomHex} className="flex items-center gap-2 pb-1">
                 <input
                   type="text"
-                  placeholder="#05a081"
+                  placeholder="#5e6ad2"
                   value={customHexInput}
                   onChange={(e) => setCustomHexInput(e.target.value)}
-                  className="px-3 py-1 rounded-lg bg-white dark:bg-[#1f222e] border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-900 dark:text-white font-mono w-28 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="px-3 py-1.5 rounded-xl bg-[#18181b] border border-[#27272a] text-xs text-white font-mono w-28 focus:outline-none focus:border-[#5e6ad2]"
                 />
                 <button
                   type="submit"
-                  className="px-2.5 py-1 rounded-lg bg-emerald-500 text-white font-medium text-xs cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-[#5e6ad2] text-white font-medium text-xs cursor-pointer hover:bg-[#6c78e6]"
                 >
                   Apply
                 </button>
@@ -227,11 +227,11 @@ export const AdvancedSearchFilters: React.FC<AdvancedSearchFiltersProps> = ({
                     key={color.id}
                     onClick={() => onChangeColor(color.id as PexelsColorPalette)}
                     className={`relative w-6 h-6 rounded-full flex items-center justify-center transition-transform hover:scale-110 cursor-pointer ${
-                      isSelected ? 'ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-[#151720]' : ''
+                      isSelected ? 'ring-2 ring-[#5e6ad2] ring-offset-2 ring-offset-[#121215]' : ''
                     }`}
                     style={{
                       backgroundColor: color.id === 'all' ? '#a1a1aa' : color.hex,
-                      border: color.border ? `1px solid ${color.border}` : '1px solid rgba(0,0,0,0.15)',
+                      border: color.border ? `1px solid ${color.border}` : '1px solid rgba(255,255,255,0.15)',
                     }}
                     title={color.name}
                   >

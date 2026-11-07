@@ -1,13 +1,19 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* 
- * Android & iPhone Mobile Stability, Smoothness & Hardware Acceleration Engine
+ * Linear-Inspired Dark Theme Variables & Engine
+ * Background: #0a0a0a, Cards: #121212, Borders: #1f1f1f, Accent: #5e6ad2 (Linear Indigo)
  */
 :root {
   --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
+  --linear-bg: #0a0a0a;
+  --linear-card: #121212;
+  --linear-border: #1f1f1f;
+  --linear-accent: #5e6ad2;
 }
 
 html {
@@ -17,13 +23,17 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  background-color: #0a0a0a;
+  color-scheme: dark;
 }
 
 body {
   overflow-x: hidden;
   min-height: 100vh;
   min-height: 100dvh;
-  background-color: #08090d;
+  background-color: #0a0a0a;
+  color: #f4f4f5;
+  font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
 }
 
 /* Safe area utilities for iPhone notch, dynamic island, and home indicator */
@@ -111,5 +121,40 @@ body {
   * {
     -webkit-tap-highlight-color: transparent;
   }
+}
+
+/* Linear-inspired glassmorphism and glowing effects */
+.linear-glass {
+  background: rgba(18, 18, 18, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.linear-glow-input:focus-within {
+  border-color: rgba(94, 106, 210, 0.6);
+  box-shadow: 0 0 25px -4px rgba(94, 106, 210, 0.3), 0 0 0 1px rgba(94, 106, 210, 0.4);
+}
+
+.linear-card-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.linear-card-hover:hover {
+  border-color: rgba(94, 106, 210, 0.45);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8), 0 0 20px -5px rgba(94, 106, 210, 0.15);
+}
+
+.linear-pill {
+  background: #121212;
+  border: 1px solid #1f1f1f;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.linear-pill:hover {
+  background: #18181b;
+  border-color: rgba(94, 106, 210, 0.4);
+  color: #ffffff;
+  box-shadow: 0 0 12px -2px rgba(94, 106, 210, 0.2);
 }
 

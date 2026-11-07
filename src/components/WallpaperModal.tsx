@@ -579,7 +579,7 @@ exit
       role="dialog"
       aria-modal="true"
       aria-label={`Wallpaper details for ${wallpaper.title}`}
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/80 backdrop-blur-md overflow-y-auto overscroll-contain animate-in fade-in duration-200 safe-inset"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-xl overflow-y-auto overscroll-contain animate-in fade-in duration-200 safe-inset"
       onClick={onClose}
     >
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
@@ -588,14 +588,14 @@ exit
 
       <div
         id="wallpaper-modal-container"
-        className="w-full max-w-5xl my-auto bg-white dark:bg-[#121319] border border-zinc-200 dark:border-zinc-800 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col text-zinc-900 dark:text-zinc-100 relative max-h-[94vh] max-h-[94dvh] gpu-layer"
+        className="w-full max-w-5xl my-auto bg-[#0d0d10] border border-[#1f1f1f] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col text-zinc-100 relative max-h-[94vh] max-h-[94dvh] gpu-layer"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Pexels Style Header: Author on left, Pexels Green "Free Download" button on right */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#121319] select-none">
+        {/* Unsplash Style Header with Linear Glassmorphism: Author on left, Prominent "Download HD" button on right */}
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-[#1f1f1f] bg-[#0d0d10]/95 select-none">
           {/* Author info */}
           <div className="flex items-center gap-3 min-w-0 pr-2">
-            <div className="w-9 h-9 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-white font-bold flex items-center justify-center text-sm shrink-0 shadow-xs border border-zinc-300 dark:border-zinc-700">
+            <div className="w-9 h-9 rounded-xl bg-white/10 text-white font-bold flex items-center justify-center text-sm shrink-0 shadow-sm border border-white/15">
               {authorInitial}
             </div>
             <div className="min-w-0">
@@ -604,16 +604,16 @@ exit
                   href={wallpaper.authorLink || wallpaper.authorProfile || 'https://www.pexels.com'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold text-sm text-zinc-900 dark:text-white hover:text-emerald-500 dark:hover:text-emerald-400 flex items-center gap-1 truncate"
+                  className="font-semibold text-sm text-white hover:text-[#8b95f6] flex items-center gap-1 truncate transition-colors"
                 >
                   <span className="truncate">{wallpaper.authorName}</span>
                   <ExternalLink className="w-3 h-3 text-zinc-400 shrink-0" />
                 </a>
-                <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#1a1a24] text-[#8b95f6] border border-[#2e2e40]">
                   Free to use
                 </span>
               </div>
-              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate">
+              <p className="text-[11px] text-zinc-400 truncate">
                 {wallpaper.title || `${categoryCapitalized} Wallpaper`}
               </p>
             </div>
@@ -621,81 +621,81 @@ exit
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* Pexels Signature "Free Download" Button with Dropdown Chevron */}
+            {/* Prominent "Download HD" Button with Dropdown Chevron (Unsplash / Linear Style) */}
             <div className="relative flex items-center">
-              <div className="inline-flex rounded-lg shadow-sm">
+              <div className="inline-flex rounded-xl shadow-lg shadow-[#5e6ad2]/20">
                 <button
                   id="btn-modal-free-download"
                   onClick={() => handleDownload('original')}
                   disabled={downloadingRes !== null}
-                  className="px-3.5 sm:px-4 py-2 rounded-l-lg bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold text-xs sm:text-sm flex items-center gap-2 transition-colors cursor-pointer"
+                  className="px-3.5 sm:px-4 py-2 rounded-l-xl bg-[#5e6ad2] hover:bg-[#6c78e6] active:bg-[#525db8] text-white font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer"
                 >
                   {downloadingRes ? (
                     <span className="animate-spin text-white">◷</span>
                   ) : (
                     <Download className="w-4 h-4 stroke-[2.5]" />
                   )}
-                  <span>Free Download</span>
+                  <span>Download HD</span>
                 </button>
                 <button
                   onClick={() => setShowResDropdown((prev) => !prev)}
-                  className="px-2 py-2 rounded-r-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white border-l border-emerald-400/40 transition-colors cursor-pointer"
+                  className="px-2.5 py-2 rounded-r-xl bg-[#525db8] hover:bg-[#5e6ad2] active:bg-[#4751a3] text-white border-l border-white/20 transition-all cursor-pointer"
                   title="Choose resolution"
                 >
                   <ChevronDown className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Resolution Dropdown Popover */}
+              {/* Resolution Dropdown Popover (Linear Glassmorphism) */}
               {showResDropdown && (
-                <div className="absolute right-0 top-full mt-2 w-64 p-2 rounded-xl bg-white dark:bg-[#1a1c24] border border-zinc-200 dark:border-zinc-800 shadow-xl z-50 space-y-1 animate-in fade-in duration-100">
-                  <div className="px-2 py-1 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-                    Choose Size
+                <div className="absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl bg-[#121215] border border-[#1f1f1f] shadow-2xl z-50 space-y-1 animate-in fade-in duration-100 backdrop-blur-xl">
+                  <div className="px-2 py-1 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider font-mono">
+                    Select Resolution
                   </div>
                   <button
                     onClick={() => handleDownload('original')}
-                    className="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between"
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-[#1a1a22] flex items-center justify-between text-zinc-200 transition-colors"
                   >
                     <div>
-                      <div className="font-semibold text-zinc-900 dark:text-white">Original (4K Raw)</div>
-                      <div className="text-[10px] text-zinc-500 font-mono">
+                      <div className="font-semibold text-white">Original (4K Raw)</div>
+                      <div className="text-[10px] text-zinc-400 font-mono">
                         {wallpaper.width} × {wallpaper.height}
                       </div>
                     </div>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-[#5e6ad2]/20 text-[#8b95f6] font-mono font-bold">
                       Master
                     </span>
                   </button>
 
                   <button
                     onClick={() => handleDownload('desktop')}
-                    className="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between"
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-[#1a1a22] flex items-center justify-between text-zinc-200 transition-colors"
                   >
                     <div>
-                      <div className="font-semibold text-zinc-900 dark:text-white">Desktop 16:9</div>
-                      <div className="text-[10px] text-zinc-500 font-mono">3840 × 2160 UHD</div>
+                      <div className="font-semibold text-white">Desktop 16:9</div>
+                      <div className="text-[10px] text-zinc-400 font-mono">3840 × 2160 UHD</div>
                     </div>
                     <Monitor className="w-3.5 h-3.5 text-zinc-400" />
                   </button>
 
                   <button
                     onClick={() => handleDownload('mobile')}
-                    className="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between"
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-[#1a1a22] flex items-center justify-between text-zinc-200 transition-colors"
                   >
                     <div>
-                      <div className="font-semibold text-zinc-900 dark:text-white">Mobile 9:16</div>
-                      <div className="text-[10px] text-zinc-500 font-mono">1440 × 2560 QHD</div>
+                      <div className="font-semibold text-white">Mobile 9:16</div>
+                      <div className="text-[10px] text-zinc-400 font-mono">1440 × 2560 QHD</div>
                     </div>
                     <Smartphone className="w-3.5 h-3.5 text-zinc-400" />
                   </button>
 
                   <button
                     onClick={() => handleDownload('tablet')}
-                    className="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between"
+                    className="w-full text-left px-3 py-2 rounded-xl text-xs hover:bg-[#1a1a22] flex items-center justify-between text-zinc-200 transition-colors"
                   >
                     <div>
-                      <div className="font-semibold text-zinc-900 dark:text-white">Tablet 4:3</div>
-                      <div className="text-[10px] text-zinc-500 font-mono">2048 × 1536 Retina</div>
+                      <div className="font-semibold text-white">Tablet 4:3</div>
+                      <div className="text-[10px] text-zinc-400 font-mono">2048 × 1536 Retina</div>
                     </div>
                     <Tablet className="w-3.5 h-3.5 text-zinc-400" />
                   </button>
@@ -706,12 +706,12 @@ exit
             {/* Favorite Button */}
             <button
               onClick={(e) => onToggleFavorite(wallpaper.id, e)}
-              className={`p-2 rounded-lg transition-colors cursor-pointer border ${
+              className={`p-2 rounded-xl transition-all cursor-pointer border ${
                 isFavorite
-                  ? 'bg-rose-50 dark:bg-rose-500/20 text-rose-500 border-rose-200 dark:border-rose-500/30'
-                  : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border-transparent'
+                  ? 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+                  : 'bg-[#18181b] hover:bg-[#202025] text-zinc-400 hover:text-white border-[#27272a]'
               }`}
-              title={isFavorite ? 'Remove from saved' : 'Save'}
+              title={isFavorite ? 'Remove from saved' : 'Save to favorites'}
             >
               <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
             </button>
@@ -722,10 +722,10 @@ exit
                 id="btn-modal-share"
                 onClick={handleShare}
                 disabled={isSharing}
-                className={`p-2 rounded-lg transition-colors cursor-pointer border ${
+                className={`p-2 rounded-xl transition-all cursor-pointer border ${
                   copiedLink || shareFeedback
-                    ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30'
-                    : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border-transparent'
+                    ? 'bg-[#5e6ad2]/20 text-[#8b95f6] border-[#5e6ad2]/30'
+                    : 'bg-[#18181b] hover:bg-[#202025] text-zinc-400 hover:text-white border-[#27272a]'
                 }`}
                 title={hasWebShare ? 'Share wallpaper (Use as Wallpaper, Save, AirDrop)' : 'Copy wallpaper link'}
                 aria-label={hasWebShare ? 'Share wallpaper' : 'Copy wallpaper link'}
@@ -733,13 +733,13 @@ exit
                 {isSharing ? (
                   <span className="w-4 h-4 flex items-center justify-center animate-spin text-xs">◷</span>
                 ) : copiedLink || (shareFeedback && shareFeedback.includes('Shared')) ? (
-                  <Check className="w-4 h-4 text-emerald-500" />
+                  <Check className="w-4 h-4 text-emerald-400" />
                 ) : (
                   <Share2 className="w-4 h-4" />
                 )}
               </button>
               {shareFeedback && (
-                <div className="absolute right-0 top-full mt-1.5 px-2.5 py-1 bg-zinc-900 text-white text-[11px] font-medium rounded-lg shadow-lg whitespace-nowrap z-50 pointer-events-none animate-in fade-in duration-150">
+                <div className="absolute right-0 top-full mt-1.5 px-2.5 py-1 bg-[#1a1a24] border border-[#2e2e38] text-white text-[11px] font-medium rounded-xl shadow-2xl whitespace-nowrap z-50 pointer-events-none animate-in fade-in duration-150">
                   {shareFeedback}
                 </div>
               )}
@@ -748,10 +748,10 @@ exit
             {/* Slideshow button */}
             <button
               onClick={() => setIsSlideshowActive((prev) => !prev)}
-              className={`p-2 rounded-lg transition-colors cursor-pointer hidden sm:block ${
+              className={`p-2 rounded-xl transition-all cursor-pointer hidden sm:block border ${
                 isSlideshowActive
-                  ? 'bg-emerald-500 text-white'
-                  : 'bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300'
+                  ? 'bg-[#5e6ad2] text-white border-[#6c78e6]'
+                  : 'bg-[#18181b] hover:bg-[#202025] text-zinc-400 hover:text-white border-[#27272a]'
               }`}
               title={isSlideshowActive ? 'Pause slideshow' : 'Start slideshow'}
             >
@@ -761,7 +761,7 @@ exit
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-[#18181b] transition-colors cursor-pointer"
               aria-label="Close"
             >
               <X className="w-4 h-4" />
@@ -840,43 +840,50 @@ exit
             />
           </div>
 
-          {/* Quick Technical Details Row (Pexels Style) */}
-          <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-zinc-50 dark:bg-[#161822] border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-400">
-            <div className="flex items-center gap-6">
+          {/* Quick Technical Details Row (Unsplash / Linear Style Metadata) */}
+          <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[#121215] border border-[#1f1f1f] text-xs text-zinc-400">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 w-full sm:w-auto">
               <div>
-                <span className="text-[10px] uppercase font-mono block text-zinc-400">Resolution</span>
-                <span className="font-semibold text-zinc-900 dark:text-white font-mono">
+                <span className="text-[10px] uppercase font-mono block text-zinc-500 tracking-wider">Resolution</span>
+                <span className="font-semibold text-white font-mono text-sm">
                   {wallpaper.width} × {wallpaper.height}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-mono block text-zinc-400">Quality</span>
-                <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                  {wallpaper.width >= 3840 ? '4K Ultra HD' : wallpaper.width >= 2560 ? '2K Quad HD' : 'Full HD'}
+                <span className="text-[10px] uppercase font-mono block text-zinc-500 tracking-wider">Category</span>
+                <span className="font-semibold text-white capitalize text-sm">
+                  {wallpaper.category || 'wallpaper'}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] uppercase font-mono block text-zinc-400">Aspect Ratio</span>
-                <span className="font-semibold text-zinc-900 dark:text-white">
-                  {wallpaper.orientation === 'landscape' ? '16:9 Desktop' : '9:16 Mobile'}
+                <span className="text-[10px] uppercase font-mono block text-zinc-500 tracking-wider">Views</span>
+                <span className="font-semibold text-white font-mono text-sm">
+                  {(wallpaper.views || 14200).toLocaleString()}
+                </span>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase font-mono block text-zinc-500 tracking-wider">Quality</span>
+                <span className="font-semibold text-[#8b95f6] text-sm flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#5e6ad2]" />
+                  {wallpaper.width >= 3840 ? '4K Ultra HD' : wallpaper.width >= 2560 ? '2K Quad HD' : 'Full HD'}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-zinc-500">{licenseName}</span>
+            <div className="flex items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#1f1f1f] w-full sm:w-auto justify-between sm:justify-end">
+              <span className="text-[11px] font-mono text-zinc-500">{licenseName}</span>
             </div>
           </div>
 
           {/* 1-Click Set as Wallpaper Hub (Phone & Desktop) */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#8b95f6]" />
                 1-Click Set as Wallpaper
               </span>
               {(phoneActionFeedback || desktopActionFeedback) && (
-                <span className="text-xs font-mono text-emerald-500 animate-pulse">
+                <span className="text-xs font-mono text-[#8b95f6] animate-pulse">
                   {phoneActionFeedback || desktopActionFeedback}
                 </span>
               )}
@@ -884,20 +891,20 @@ exit
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {/* Phone Wallpaper Card */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-zinc-50 dark:via-[#161822] to-teal-500/5 border border-emerald-500/25 flex flex-col justify-between gap-3 shadow-xs">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#5e6ad2]/10 via-[#121215] to-[#121215] border border-[#5e6ad2]/25 flex flex-col justify-between gap-3 shadow-lg">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#5e6ad2]/20 text-[#8b95f6] flex items-center justify-center shrink-0 border border-[#5e6ad2]/30">
                     <Smartphone className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-sm text-zinc-900 dark:text-white">Set as Phone Wallpaper</h4>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                        iOS & Android
+                      <h4 className="font-bold text-sm text-white">Set as Phone Wallpaper</h4>
+                      <span className="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-[#5e6ad2]/20 text-[#8b95f6] border border-[#5e6ad2]/30">
+                        iOS &amp; Android
                       </span>
                     </div>
-                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed">
-                      Opens native system sheet: tap <span className="font-semibold text-emerald-600 dark:text-emerald-400">"Use as Wallpaper"</span> (استخدام كخلفية) on iPhone or Android.
+                    <p className="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">
+                      Opens native system sheet: tap <span className="font-semibold text-[#8b95f6]">&ldquo;Use as Wallpaper&rdquo;</span> (استخدام كخلفية) on iPhone or Android.
                     </p>
                   </div>
                 </div>
@@ -906,7 +913,7 @@ exit
                   id="btn-set-as-phone-wallpaper"
                   onClick={handleSetAsPhoneWallpaper}
                   disabled={isSettingPhone}
-                  className="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm hover:shadow"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#5e6ad2] hover:bg-[#6c78e6] active:bg-[#525db8] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shadow-[#5e6ad2]/25"
                 >
                   {isSettingPhone ? (
                     <span className="animate-spin text-white">◷</span>
@@ -920,19 +927,19 @@ exit
               </div>
 
               {/* Desktop / PC Wallpaper Card */}
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-500/10 via-zinc-50 dark:via-[#161822] to-indigo-500/5 border border-blue-500/25 flex flex-col justify-between gap-3 shadow-xs">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-[#1a1a24] via-[#121215] to-[#121215] border border-[#2e2e38] flex flex-col justify-between gap-3 shadow-lg">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center shrink-0 border border-white/15">
                     <Laptop className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-sm text-zinc-900 dark:text-white">Set as Desktop Wallpaper</h4>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                      <h4 className="font-bold text-sm text-white">Set as Desktop Wallpaper</h4>
+                      <span className="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-white/10 text-zinc-300 border border-white/15">
                         PC / Windows / Mac
                       </span>
                     </div>
-                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed">
+                    <p className="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">
                       1-Click Windows Auto-Setter script (.bat) or instant right-click background shortcut.
                     </p>
                   </div>
@@ -942,16 +949,16 @@ exit
                   <button
                     id="btn-set-desktop-windows-script"
                     onClick={handleDownloadWindowsWallpaperBat}
-                    className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm hover:shadow"
+                    className="py-2.5 px-3 rounded-xl bg-[#22222b] hover:bg-[#2b2b36] active:bg-[#1a1a22] text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-[#383845] shadow-sm"
                     title="Downloads 1-click Windows script that sets desktop instantly"
                   >
-                    <Terminal className="w-3.5 h-3.5" />
+                    <Terminal className="w-3.5 h-3.5 text-[#8b95f6]" />
                     <span>⚡ 1-Click Windows</span>
                   </button>
                   <button
                     id="btn-set-desktop-guide"
                     onClick={() => setShowDesktopModal(true)}
-                    className="py-2.5 px-3 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-zinc-300 dark:border-zinc-700"
+                    className="py-2.5 px-3 rounded-xl bg-[#18181b] hover:bg-[#202025] text-zinc-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-[#27272a]"
                   >
                     <HelpCircle className="w-3.5 h-3.5 text-zinc-500" />
                     <span>How it works</span>
@@ -961,15 +968,15 @@ exit
             </div>
           </div>
 
-          {/* Download Center Options */}
+          {/* Download Formats Grid */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
-                <Download className="w-3.5 h-3.5 text-emerald-500" />
-                Download Formats
+              <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                <Download className="w-3.5 h-3.5 text-[#8b95f6]" />
+                All Download Formats
               </span>
               {downloadStatus && (
-                <span className="text-xs font-mono text-emerald-500 animate-pulse">{downloadStatus}</span>
+                <span className="text-xs font-mono text-[#8b95f6] animate-pulse">{downloadStatus}</span>
               )}
             </div>
 
@@ -977,7 +984,7 @@ exit
               <button
                 onClick={() => handleDownload('original')}
                 disabled={downloadingRes !== null}
-                className="p-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs flex items-center justify-between transition-colors cursor-pointer"
+                className="p-3 rounded-2xl bg-[#5e6ad2] hover:bg-[#6c78e6] text-white font-semibold text-xs flex items-center justify-between transition-colors cursor-pointer shadow-md shadow-[#5e6ad2]/20"
               >
                 <div>
                   <div className="font-bold">Original 4K</div>
@@ -989,11 +996,11 @@ exit
               <button
                 onClick={() => handleDownload('desktop')}
                 disabled={downloadingRes !== null}
-                className="p-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#1a1c24] dark:hover:bg-[#222530] text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-800 font-semibold text-xs flex items-center justify-between transition-colors cursor-pointer"
+                className="p-3 rounded-2xl bg-[#121215] hover:bg-[#18181c] text-white border border-[#1f1f1f] hover:border-[#2e2e38] font-semibold text-xs flex items-center justify-between transition-colors cursor-pointer"
               >
                 <div>
                   <div>Desktop 16:9</div>
-                  <div className="text-[10px] text-zinc-500 font-mono">3840 × 2160 UHD</div>
+                  <div className="text-[10px] text-zinc-400 font-mono">3840 × 2160 UHD</div>
                 </div>
                 <Monitor className="w-4 h-4 text-zinc-400" />
               </button>
@@ -1001,11 +1008,11 @@ exit
               <button
                 onClick={() => handleDownload('mobile')}
                 disabled={downloadingRes !== null}
-                className="p-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#1a1c24] dark:hover:bg-[#222530] text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-800 font-semibold text-xs flex items-center justify-between transition-colors cursor-pointer"
+                className="p-3 rounded-2xl bg-[#121215] hover:bg-[#18181c] text-white border border-[#1f1f1f] hover:border-[#2e2e38] font-semibold text-xs flex items-center justify-between transition-colors cursor-pointer"
               >
                 <div>
                   <div>Mobile 9:16</div>
-                  <div className="text-[10px] text-zinc-500 font-mono">1440 × 2560 QHD</div>
+                  <div className="text-[10px] text-zinc-400 font-mono">1440 × 2560 QHD</div>
                 </div>
                 <Smartphone className="w-4 h-4 text-zinc-400" />
               </button>
@@ -1013,11 +1020,11 @@ exit
               <button
                 onClick={() => handleDownload('tablet')}
                 disabled={downloadingRes !== null}
-                className="p-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-[#1a1c24] dark:hover:bg-[#222530] text-zinc-900 dark:text-white border border-zinc-200 dark:border-zinc-800 font-semibold text-xs flex items-center justify-between transition-colors cursor-pointer"
+                className="p-3 rounded-2xl bg-[#121215] hover:bg-[#18181c] text-white border border-[#1f1f1f] hover:border-[#2e2e38] font-semibold text-xs flex items-center justify-between transition-colors cursor-pointer"
               >
                 <div>
                   <div>Tablet 4:3</div>
-                  <div className="text-[10px] text-zinc-500 font-mono">2048 × 1536 Retina</div>
+                  <div className="text-[10px] text-zinc-400 font-mono">2048 × 1536 Retina</div>
                 </div>
                 <Tablet className="w-4 h-4 text-zinc-400" />
               </button>
@@ -1033,21 +1040,22 @@ exit
             />
           </div>
 
-          {/* Similar Wallpapers (Pexels "Similar Photos" section) */}
+          {/* Similar Wallpapers (Unsplash / Pexels Related Grid) */}
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-white tracking-tight">
-                Similar 4K Wallpapers
+              <h3 className="text-sm font-bold text-white tracking-tight flex items-center gap-2">
+                <span>Related 4K Wallpapers</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#5e6ad2]" />
               </h3>
               {relatedKeyword && (
-                <span className="text-xs text-zinc-500">#{relatedKeyword}</span>
+                <span className="text-xs text-zinc-400 font-mono">#{relatedKeyword}</span>
               )}
             </div>
 
             {isLoadingRelated ? (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="aspect-video rounded-xl bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
+                  <div key={i} className="aspect-video rounded-2xl bg-[#121215] border border-[#1f1f1f] animate-pulse" />
                 ))}
               </div>
             ) : relatedWallpapers.length > 0 ? (
@@ -1056,7 +1064,7 @@ exit
                   <button
                     key={relWp.id}
                     onClick={() => handleSelectRelated(relWp)}
-                    className="group relative aspect-video rounded-xl overflow-hidden bg-zinc-200 dark:bg-zinc-800 transition-all cursor-pointer text-left"
+                    className="group relative aspect-video rounded-2xl overflow-hidden bg-[#121215] border border-[#1f1f1f] hover:border-[#5e6ad2]/50 transition-all cursor-pointer text-left"
                   >
                     <img
                       src={relWp.thumbnail || relWp.imageUrl || relWp.url}
@@ -1079,8 +1087,8 @@ exit
             ) : null}
           </div>
 
-          {/* Tags & Creative License */}
-          <div className="p-4 rounded-xl bg-zinc-50 dark:bg-[#161822] border border-zinc-200 dark:border-zinc-800 space-y-3">
+          {/* Tags & Creative License (Linear Aesthetic) */}
+          <div className="p-4 rounded-2xl bg-[#121215] border border-[#1f1f1f] space-y-3">
             <div className="flex flex-wrap gap-1.5">
               {wallpaper.tags.map((tag) => (
                 <button
@@ -1089,14 +1097,14 @@ exit
                     onTagClick(tag);
                     onClose();
                   }}
-                  className="px-2.5 py-1 rounded-full text-xs bg-zinc-200/80 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-colors cursor-pointer"
+                  className="px-3 py-1 rounded-xl text-xs bg-[#18181f] hover:bg-[#202028] text-zinc-300 hover:text-white border border-[#272733] transition-colors cursor-pointer"
                 >
                   #{tag}
                 </button>
               ))}
             </div>
 
-            <p className="text-xs text-zinc-500 leading-relaxed">
+            <p className="text-xs text-zinc-500 leading-relaxed font-mono">
               Téléchargez gratuitement ce fond d&apos;écran 4K ultra-haute définition &ldquo;{wallpaper.title}&rdquo; par {wallpaper.authorName}. Royalty-free under {licenseName}.
             </p>
           </div>

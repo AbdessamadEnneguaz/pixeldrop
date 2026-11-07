@@ -223,8 +223,8 @@ export default function App() {
   return (
     <div
       className={`min-h-screen ${
-        isDark ? 'bg-[#121319] text-zinc-100' : 'bg-[#fafafa] text-zinc-900'
-      } flex flex-col font-['Plus_Jakarta_Sans',sans-serif] transition-colors`}
+        isDark ? 'bg-[#0a0a0a] text-[#f4f4f5]' : 'bg-[#fafafa] text-zinc-900'
+      } flex flex-col font-['Inter',system-ui,sans-serif] selection:bg-[#5e6ad2] selection:text-white transition-colors`}
     >
       {/* Navigation Bar */}
       <Navbar
@@ -304,9 +304,9 @@ export default function App() {
 
             {/* Active Search Banner */}
             {searchQuery && (
-              <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-100 dark:bg-[#1a1c24] border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-700 dark:text-zinc-300">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-100 dark:bg-[#121212] border border-zinc-200 dark:border-[#1f1f1f] text-xs text-zinc-700 dark:text-zinc-300">
                 <div className="flex items-center gap-2">
-                  <Search className="w-3.5 h-3.5 text-emerald-500" />
+                  <Search className="w-3.5 h-3.5 text-[#8b95f6]" />
                   <span>
                     Searching 4K wallpapers for &ldquo;
                     <strong className="text-zinc-900 dark:text-white font-semibold">{searchQuery}</strong>
@@ -315,7 +315,7 @@ export default function App() {
                 </div>
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold cursor-pointer flex items-center gap-1"
+                  className="text-[#8b95f6] hover:text-[#a5affd] dark:text-[#8b95f6] dark:hover:text-[#a5affd] hover:underline font-semibold cursor-pointer flex items-center gap-1"
                 >
                   <X className="w-3.5 h-3.5" />
                   <span>Clear search</span>
@@ -328,14 +328,14 @@ export default function App() {
         {/* Favorites Header View */}
         {activeTab === 'favorites' && (
           <div className="py-4 space-y-3">
-            <div className="p-4 rounded-xl bg-zinc-100 dark:bg-[#1a1c24] border border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
+            <div className="p-4 rounded-xl bg-zinc-100 dark:bg-[#121212] border border-zinc-200 dark:border-[#1f1f1f] flex items-center justify-between">
               <div className="flex items-center gap-2.5 text-zinc-900 dark:text-white font-semibold text-sm">
                 <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
                 <span>Your Saved Wallpapers ({favorites.length})</span>
               </div>
               <button
                 onClick={() => setActiveTab('wallpapers')}
-                className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer font-medium"
+                className="text-xs text-[#8b95f6] hover:text-[#a5affd] hover:underline cursor-pointer font-medium"
               >
                 ← Back to Wallpapers
               </button>

@@ -25,7 +25,7 @@ export function useSystemTheme() {
     } catch {
       // Storage unavailable fallback
     }
-    return 'system';
+    return 'dark';
   });
 
   // 2. Track OS system preference match
