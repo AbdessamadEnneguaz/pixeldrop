@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   Wallpaper,
   WallpaperCategory,
@@ -49,6 +49,7 @@ export default function App() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [totalIndexed, setTotalIndexed] = useState(12000);
+  const isFetchingRef = useRef(false);
 
   // Modals state
   const [selectedWallpaper, setSelectedWallpaper] = useState<Wallpaper | null>(null);
@@ -85,6 +86,7 @@ export default function App() {
 
   // Initial and Category/Search/Color/Resolution load
   const loadInitialWallpapers = useCallback(async () => {
+    isFetchingRef.current = true;
     setIsLoadingMore(true);
     const batchSize = typeof window !== 'undefined' && window.innerWidth < 768 ? 18 : 24;
     try {
@@ -105,6 +107,7 @@ export default function App() {
     } catch (err) {
       console.error('Failed to load initial wallpapers:', err);
     } finally {
+      isFetchingRef.current = false;
       setIsLoadingMore(false);
     }
   }, [selectedCategory, debouncedSearch, selectedColor, selectedResolution, orientation]);
@@ -113,9 +116,10 @@ export default function App() {
     loadInitialWallpapers();
   }, [loadInitialWallpapers]);
 
-  // High-performance Infinite Scroll Handler
+  // High-performance Infinite Scroll Handler (Strict concurrency guard & append-only)
   const handleLoadMore = useCallback(async () => {
-    if (isLoadingMore || !hasMore) return;
+    if (isFetchingRef.current || !hasMore) return;
+    isFetchingRef.current = true;
     setIsLoadingMore(true);
     const nextPage = page + 1;
     const batchSize = typeof window !== 'undefined' && window.innerWidth < 768 ? 18 : 24;
@@ -145,9 +149,10 @@ export default function App() {
     } catch (err) {
       console.error('Infinite scroll fetch error:', err);
     } finally {
+      isFetchingRef.current = false;
       setIsLoadingMore(false);
     }
-  }, [isLoadingMore, hasMore, page, selectedCategory, debouncedSearch, selectedColor, selectedResolution, orientation]);
+  }, [hasMore, page, selectedCategory, debouncedSearch, selectedColor, selectedResolution, orientation]);
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();

@@ -74,7 +74,7 @@ export const WallpaperCard: React.FC<WallpaperCardProps> = ({
     <div
       id={`wallpaper-card-${wallpaper.id}`}
       onClick={() => onSelect(wallpaper)}
-      className="group wallpaper-card-contain relative mb-4 break-inside-avoid block w-full cursor-pointer rounded-2xl overflow-hidden bg-[#121212] border border-[#1f1f1f] hover:border-[#5e6ad2]/50 hover:shadow-2xl hover:shadow-[#5e6ad2]/10 transition-all duration-300 active:scale-[0.98] touch-manipulation"
+      className="group wallpaper-card-contain relative mb-0 break-inside-avoid block w-full cursor-pointer rounded-2xl overflow-hidden bg-[#121212] border border-[#1f1f1f] hover:border-[#5e6ad2]/50 hover:shadow-2xl hover:shadow-[#5e6ad2]/10 transition-all duration-300 active:scale-[0.98] touch-manipulation"
     >
       {/* Container with dynamic aspect-ratio based on image dimensions */}
       <div
